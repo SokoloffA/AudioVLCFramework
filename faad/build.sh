@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -euo pipefail
+
+CONFIGURE_FLAGS+=" -DCMAKE_INSTALL_PREFIX=${ROOT_DIR}"
+# CONFIGURE_FLAGS+=" --quiet"
+
+CONFIGURE_FLAGS+=" -DCMAKE_BUILD_TYPE=Release"
+
+#CONFIGURE_FLAGS+=" --enable-static"
+CONFIGURE_FLAGS+=" -DFAAD_BUILD_CLI=OFF"
+CONFIGURE_FLAGS+=" -DBUILD_SHARED_LIBS=OFF"
+
+cmake ${CONFIGURE_FLAGS} .
+make -j ${PROC_NUM}
+make install

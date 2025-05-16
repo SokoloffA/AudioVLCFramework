@@ -1,0 +1,4 @@
+AudioVLC.xcframework
+AudioVLC.xcframework.*
+.build
+build
