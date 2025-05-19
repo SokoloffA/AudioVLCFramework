@@ -30,6 +30,29 @@ function lazy_configure() {
 
 export -f lazy_configure
 
+function extaract_sources() {
+    local project=$1
+
+    if [ -d "${project}/sources" ]; then
+        echo "Syncing sources ........................."
+        local in_dir="${project}/sources"
+        local out_dir="${BUILD_DIR}/sources"
+        rsync -ra "${in_dir}/" "${out_dir}/"
+        echo "Sources successfully synced ............."
+        return 0
+    fi
+
+    if [ ! -d "${BUILD_DIR}/sources" ]; then
+        echo "Extractiong sources ....................."
+        tar=`find ${project} -type file -name "*.tar.gz" -or -name "*.tar.xz" -or -name "*.tar.bz2"`
+        mkdir -p "${BUILD_DIR}/sources"
+        tar -xf "${tar}" --strip-components=1 -C "${BUILD_DIR}/sources"
+        echo "Sources successfully extracted .........."
+        return 0
+    fi
+}
+
+
 function build() {
     local project=$1
 
@@ -44,13 +67,7 @@ function build() {
         echo "*****************************************"
         echo "** ${project}"
 
-        if [ ! -d "${BUILD_DIR}/sources" ]; then
-            echo "Extractiong sources ....................."
-            tar=`find ${project} -type file -name "*.tar.gz" -or -name "*.tar.xz" -or -name "*.tar.bz2"`
-            mkdir -p "${BUILD_DIR}/sources"
-            tar -xf "${tar}" --strip-components=1 -C "${BUILD_DIR}/sources"
-            echo "Sources successfully extracted .........."
-        fi
+        extaract_sources "${project}"
 
         pushd "${BUILD_DIR}/sources" 2>&1> /dev/null
         echo "Building for ${arch} ........................"

@@ -2,3 +2,5 @@ AudioVLC.xcframework
 AudioVLC.xcframework.*
 .build
 build
+*.log
+*.tmp
