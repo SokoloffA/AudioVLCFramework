@@ -21,12 +21,14 @@ function test() {
     fi
 }
 
+
 ########################
 
 test http://sc2.radiocaroline.net:8040/
 test http://www.rcgoldserver.com:8253
-test http://stream.radioparadise.com/flac
+test http://stream.radioparadise.com/flac --skip-metadata
 test http://sc3.radiocaroline.net:8030
+test https://c22.radioboss.fm:8144/GamePlay
 test https://mediaserviceslive.akamaized.net/hls/live/2038308/triplejnsw/index.m3u8 --skip-metadata
 
 echo ""

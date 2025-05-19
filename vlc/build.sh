@@ -48,7 +48,7 @@ export CONFIGURE_FLAGS=(
     --disable-asdcp          # build with asdcp support enabled [default=auto]
 
 # Mux/Demux plugins:
-    --disable-dvbpsi         # build with dvbpsi support enabled [default=auto]
+    --enable-dvbpsi          # build with dvbpsi support enabled [default=auto]
     --disable-gme            # Game Music Emu support (default auto) [default=auto]
     --disable-sid            # C64 sid demux support (default auto)
     --enable-ogg             # Ogg demux support [default=auto]

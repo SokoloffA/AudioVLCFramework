@@ -139,10 +139,13 @@ void Player::run(const string &url)
         }
     }
 
-    for (Test *t : { &mConnectionTest, &mMetadataTest }) {
-        if (*t == Test::Wait) {
-            *t = Test::Fail;
-        }
+    if (mConnectionTest == Test::Wait) {
+        libvlc_state_t state = libvlc_media_player_get_state(mPlayer);
+        mConnectionTest      = (state == libvlc_Playing) ? Test::Pass : Test::Fail;
+    }
+
+    if (mMetadataTest == Test::Wait) {
+        mMetadataTest = Test::Fail;
     }
 }
 
@@ -199,18 +202,30 @@ void Player::logCallback(void *data, int level, const libvlc_log_t *ctx, const c
     }
     // clang-format off
 
-    if (player->debug() == false && level < LIBVLC_NOTICE) {
-        return;
+
+    static constexpr int BUFF_LEN = 4 *1024;
+    char buff[BUFF_LEN];
+    vsnprintf(buff, BUFF_LEN, fmt, args);
+    string msg = buff;
+
+    if (msg.find("Stream buffering done") != std::string::npos) {
+        if ( player->mConnectionTest == Test::Wait) {
+            player->mConnectionTest = Test::Pass;
+        }
     }
 
     if (level == LIBVLC_ERROR) {
-
         player->mHasErros = true;
     }
 
-    fprintf(stderr, "    VLC LOG [%s]: ", lvl.c_str());
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
+    if (player->debug() == false && level < LIBVLC_NOTICE) {
+        return;
+    }
+    cout << "    VLC LOG [" << lvl << "]: " << msg << endl;
+    // cout << msg
+    // fprintf(stderr, "    VLC LOG [%s]: ", lvl.c_str());
+    // vfprintf(stderr, fmt, args);
+    // fprintf(stderr, "\n");
 }
 
 /****************************
@@ -223,15 +238,18 @@ void Player::vlcEvent(const libvlc_event_t *event, void *data)
 
     switch (event->type) {
         case libvlc_MediaPlayerPlaying:
-            if ( player->mConnectionTest == Test::Wait) {
-                player->mConnectionTest = player->mHasErros ? Test::Fail : Test::Pass;
-            }
+            // if ( player->mConnectionTest == Test::Wait) {
+            //     player->mConnectionTest = player->mHasErros ? Test::Fail : Test::Pass;
+            // }
             break;
 
         case libvlc_MediaPlayerPaused:
             break;
 
         case libvlc_MediaPlayerStopped:
+            if ( player->mConnectionTest == Test::Wait) {
+                player->mConnectionTest = Test::Fail;
+            }
             break;
 
         case libvlc_MediaPlayerEncounteredError:

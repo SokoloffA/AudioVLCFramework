@@ -176,6 +176,7 @@ build libogg
 build flac
 build mpg123
 build faad
+build libdvbpsi
 build vlc
 
 export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin
